@@ -1,0 +1,10 @@
+{
+  "id": "pandocx",
+  "name": "Pandocx",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "Export notes to Word (.docx) via Pandoc, with a bundled Lua filter for Zotero citations.",
+  "author": "Karl",
+  "authorUrl": "https://github.com/karl24601",
+  "isDesktopOnly": true
+}
