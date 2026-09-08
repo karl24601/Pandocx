@@ -148,7 +148,9 @@ Two caveats. The cross-references come out as hyperlinks, not Word `REF` fields,
 | Argument                                                | Effect                                                       |
 | ------------------------------------------------------- | ------------------------------------------------------------ |
 | `--toc --toc-depth=3`                                   | Inserts a table of contents field. You may need to press F9 in Word to populate it |
-| `--metadata=zotero_csl-style:chicago-note-bibliography` | Sets the citation style globally, so individual notes don't each need `zotero:` front matter |
+| `--metadata=zotero_csl-style:chicago-note-bibliography` | Sets the citation style for every export, so individual notes don't each need `zotero:` front matter |
+
+Note that a `zotero_`-prefixed argument **overrides** the note's own front matter rather than acting as a default for it. Set the style this way and every export uses it, including notes that specify something else. If you switch styles per document, leave it out and keep the setting in each note instead.
 
 Markdown footnotes (`[^1]`) already become real Word footnotes without any extra arguments — useful for explanatory notes that are not citations.
 
@@ -181,7 +183,7 @@ zotero:
 
 **Images are missing** — Pandoc runs with the note's folder as its working directory, and `--resource-path` is set to that folder plus the vault root. Images outside both need an explicit `--resource-path` entry in the extra arguments.
 
-**Wikilinks and `![[embeds]]` come out as literal text** — Pandoc does not understand Obsidian-specific syntax. Handle it in your Lua filter, or chain another filter via the extra arguments.
+**Wikilinks and `![[embeds]]` come out as literal text** — Pandoc does not understand Obsidian-specific syntax. Convert those links before exporting, or chain a filter of your own through the extra arguments.
 
 **Existing files are overwritten** — Pandoc overwrites a same-named `.docx` without prompting.
 
