@@ -148,7 +148,7 @@ Do not combine `--citeproc`, `--bibliography` or `--csl` with the bundled filter
 
 ## Credits
 
-The bundled `zotero.lua` is the **zotero-live-citations** filter from [Better BibTeX for Zotero](https://retorque.re/zotero-better-bibtex/exporting/pandoc/) by Emiliano Heyns, redistributed unmodified (revision `199d652`). All citation handling is its work; Pandocx only ships it and invokes Pandoc.
+The bundled `zotero.lua` is the **zotero-live-citations** filter from [Better BibTeX for Zotero](https://retorque.re/zotero-better-bibtex/exporting/pandoc/), copyright (c) 2016 Emiliano Heyns, redistributed unmodified under the MIT license (revision `199d652`). All citation handling is its work; Pandocx only ships it and invokes Pandoc.
 
 To update it, drop a newer `zotero.lua` in the repository root and run:
 
@@ -160,4 +160,6 @@ That regenerates the embedded copy in `main.js` and prints the new revision and 
 
 ## License
 
-Pandocx is MIT licensed. The bundled `zotero.lua` is distributed under its own license from the Better BibTeX project — see that project for terms.
+Pandocx is MIT licensed — see [LICENSE](LICENSE).
+
+The bundled `zotero.lua` is MIT licensed, copyright (c) 2016 Emiliano Heyns. Its full notice is in [LICENSE-THIRD-PARTY](LICENSE-THIRD-PARTY), and is also carried inside `main.js`, since that is the only file some install methods deliver.
