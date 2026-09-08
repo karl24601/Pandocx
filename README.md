@@ -12,7 +12,17 @@ You press a hotkey, confirm the output file name, and get a `.docx`. That's the 
 
 ## Why
 
-Obsidian's built-in export and most Markdown→Word plugins ignore citation keys. If you write with Zotero (`@smith2020`, Better BibTeX keys, etc.), you need Pandoc in the pipeline — and once Pandoc is involved you also want a Lua filter to shape the citations. Pandocx bundles that filter and takes the command line out of your way.
+Pandoc's own citation processor cannot parse CSL styles that define more than one `<layout>`. Feed it such a style and it fails outright:
+
+```
+CiteprocParseError: Multiple layout elements present in bibliography
+```
+
+Multiple layouts are a CSL-M extension, and they are exactly what bilingual styles rely on — a Chinese-language source and a Western-language source have to be formatted differently within one bibliography. The GB/T 7714 family of styles is built this way, as are many of the house styles used in Chinese legal and humanities scholarship. Support for these layouts is [still open upstream](https://github.com/jgm/citeproc/issues/120).
+
+Zotero's own processor handles them without trouble. So instead of asking Pandoc to render citations, this plugin uses Better BibTeX's Lua filter to write **live Zotero fields** into the `.docx`, and Zotero formats them when you refresh in Word — the same code path as citations inserted through Word's Zotero add-in, with the same style support.
+
+Which means the workflow is: draft in Obsidian with Better BibTeX citation keys, export, refresh in Word. Pandocx bundles the filter and takes the command line out of the way.
 
 ## Requirements
 
@@ -61,13 +71,13 @@ The name you type is the **output** name only — the input is always the note y
 
 ## Settings
 
-| Setting | Default | Notes |
-| --- | --- | --- |
-| Pandoc path | `pandoc` | Set an absolute path if Pandoc is not found |
-| Extra arguments | `-s` | e.g. `--reference-doc="My Template.docx" --toc` |
-| Output folder | *(empty)* | Empty = next to the source note. Absolute or vault-relative |
-| Save note before exporting | on | Prevents exporting stale editor content |
-| Open after exporting | off | Opens the `.docx` in your default application |
+| Setting                    | Default   | Notes                                                       |
+| -------------------------- | --------- | ----------------------------------------------------------- |
+| Pandoc path                | `pandoc`  | Set an absolute path if Pandoc is not found                 |
+| Extra arguments            | `-s`      | e.g. `--reference-doc="My Template.docx" --toc`             |
+| Output folder              | *(empty)* | Empty = next to the source note. Absolute or vault-relative |
+| Save note before exporting | on        | Prevents exporting stale editor content                     |
+| Open after exporting       | off       | Opens the `.docx` in your default application               |
 
 Arguments are passed to Pandoc as an argument array rather than through a shell, so spaces, quotes and non-ASCII characters in file names are handled correctly.
 
@@ -99,15 +109,15 @@ This pairs well with Zotero: refreshed citations are formatted with Word's `Foot
 
 ### Other arguments worth knowing
 
-| Argument | Effect |
-| --- | --- |
-| `--toc --toc-depth=3` | Inserts a table of contents field. You may need to press F9 in Word to populate it |
+| Argument                                                | Effect                                                       |
+| ------------------------------------------------------- | ------------------------------------------------------------ |
+| `--toc --toc-depth=3`                                   | Inserts a table of contents field. You may need to press F9 in Word to populate it |
 | `--metadata=zotero_csl-style:chicago-note-bibliography` | Sets the citation style globally, so individual notes don't each need `zotero:` front matter |
-| `--filter pandoc-fignos` | Numbered figure cross-references. Note that these become hyperlinks rather than Word REF fields, and `pandoc-fignos` is a separate Python program that has to be on `PATH` |
+| `--filter pandoc-fignos`                                | Numbered figure cross-references. Note that these become hyperlinks rather than Word REF fields, and `pandoc-fignos` is a separate Python program that has to be on `PATH` |
 
 Markdown footnotes (`[^1]`) already become real Word footnotes without any extra arguments — useful for explanatory notes that are not citations.
 
-Do not combine `--citeproc`, `--bibliography` or `--csl` with the bundled filter. Those drive Pandoc's own static citation processing, which conflicts with the live Zotero fields.
+Do not combine `--citeproc`, `--bibliography` or `--csl` with the bundled filter. Those switch on Pandoc's own citation processing, which conflicts with the live Zotero fields — and, for multi-layout styles, is the thing this plugin exists to avoid.
 
 ## Troubleshooting
 
