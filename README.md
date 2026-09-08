@@ -71,13 +71,13 @@ The name you type is the **output** name only — the input is always the note y
 
 ## Settings
 
-| Setting                    | Default   | Notes                                                       |
-| -------------------------- | --------- | ----------------------------------------------------------- |
-| Pandoc path                | `pandoc`  | Set an absolute path if Pandoc is not found                 |
-| Extra arguments            | `-s`      | e.g. `--reference-doc="My Template.docx" --toc`             |
-| Output folder              | *(empty)* | Empty = next to the source note. Absolute or vault-relative |
-| Save note before exporting | on        | Prevents exporting stale editor content                     |
-| Open after exporting       | off       | Opens the `.docx` in your default application               |
+| Setting | Default | Notes |
+| --- | --- | --- |
+| Pandoc path | `pandoc` | Set an absolute path if Pandoc is not found |
+| Extra arguments | `-s` | e.g. `--reference-doc="My Template.docx" --toc` |
+| Output folder | *(empty)* | Empty = next to the source note. Absolute or vault-relative |
+| Save note before exporting | on | Prevents exporting stale editor content |
+| Open after exporting | off | Opens the `.docx` in your default application |
 
 Arguments are passed to Pandoc as an argument array rather than through a shell, so spaces, quotes and non-ASCII characters in file names are handled correctly.
 
@@ -107,13 +107,48 @@ To build one:
 
 This pairs well with Zotero: refreshed citations are formatted with Word's `Footnote Text` style, so setting that style in the template makes footnotes come out right without further intervention.
 
+### Numbered figures and cross-references
+
+Optional, and only worth setting up if your figures need to be numbered and referred to by number. It requires [`pandoc-fignos`](https://github.com/tomduck/pandoc-fignos), a separate Python program that must be on `PATH`.
+
+Add to **Extra arguments**:
+
+```
+-s --filter pandoc-fignos
+```
+
+Give each figure an identifier, and reference it with `{@fig:id}`:
+
+```markdown
+![Characteristics of big data](images/bigdata.png){#fig:bigdata}
+
+As shown in {@fig:bigdata}, ...
+```
+
+`pandoc-fignos` numbers the figures in order and turns each reference into a link to the corresponding caption.
+
+By default the caption reads `Figure 1` and the reference renders as `fig. 1`. Both labels are configurable through the note's front matter, which is how you get a Chinese document to say 图 instead:
+
+```yaml
+---
+fignos-cleveref: true
+fignos-plus-name: 图
+fignos-caption-name: 图
+---
+```
+
+- `fignos-caption-name` — the word used in captions (`图 1`)
+- `fignos-plus-name` — the word used in references, so `{@fig:bigdata}` renders as `图 1` rather than a bare `1`
+- `fignos-cleveref` — makes references include that name at all; without it you get only the number
+
+Two caveats. The cross-references come out as hyperlinks, not Word `REF` fields, so they will not renumber if you reorder figures in Word afterwards — for a document that will be revised in Word, inserting captions and cross-references there is often the better choice. And on macOS and Linux, a GUI-launched Obsidian may not find `pandoc-fignos` if it lives in a conda or virtualenv environment; the symptom is `Error running filter pandoc-fignos`.
+
 ### Other arguments worth knowing
 
 | Argument                                                | Effect                                                       |
 | ------------------------------------------------------- | ------------------------------------------------------------ |
 | `--toc --toc-depth=3`                                   | Inserts a table of contents field. You may need to press F9 in Word to populate it |
 | `--metadata=zotero_csl-style:chicago-note-bibliography` | Sets the citation style globally, so individual notes don't each need `zotero:` front matter |
-| `--filter pandoc-fignos`                                | Numbered figure cross-references. Note that these become hyperlinks rather than Word REF fields, and `pandoc-fignos` is a separate Python program that has to be on `PATH` |
 
 Markdown footnotes (`[^1]`) already become real Word footnotes without any extra arguments — useful for explanatory notes that are not citations.
 
