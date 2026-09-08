@@ -113,6 +113,7 @@ This pairs well with Zotero: refreshed citations are formatted with Word's `Foot
 | ------------------------------------------------------- | ------------------------------------------------------------ |
 | `--toc --toc-depth=3`                                   | Inserts a table of contents field. You may need to press F9 in Word to populate it |
 | `--metadata=zotero_csl-style:chicago-note-bibliography` | Sets the citation style for every export, so individual notes don't each need `zotero:` front matter |
+| `-t docx+native_numbering` | Numbers figure and table captions (`Figure 1: …`) as real Word `SEQ` fields. The label comes from Pandoc's translation data and there is no Chinese one, so under `-M lang=zh` it vanishes rather than becoming 图 unless you supply your own `translations/zh.yaml` via `--data-dir`. Note that `pandoc-fignos`, which older guides recommend for this, aborts on Pandoc 3.x |
 
 Note that a `zotero_`-prefixed argument **overrides** the note's own front matter rather than acting as a default for it. Set the style this way and every export uses it, including notes that specify something else. If you switch styles per document, leave it out and keep the setting in each note instead.
 
@@ -130,24 +131,15 @@ Do not combine `--citeproc`, `--bibliography` or `--csl` with the bundled filter
 
 **Citations come out as `<Do Zotero Refresh: ...>`** — This is correct. The filter writes Word *fields*, not formatted text. Open the `.docx` in Word and click **Refresh** on the Zotero tab; Zotero then renders the citations, and produces footnotes if your CSL style is note-based.
 
-**No footnotes** — Set a note-based style in the note's front matter. The default is `apa`, which is an author-date style and never produces footnotes:
-
-```yaml
----
-zotero:
-  csl-style: chicago-note-bibliography
----
-```
-
-**Citations are untouched and `zotero.lua` is only ~700 bytes** — An early build shipped a do-nothing placeholder, and Pandocx never overwrites an existing filter, so it can survive an update. Pandocx now detects and replaces it on load; to fix it by hand, delete `zotero.lua` from the plugin folder and reload Obsidian. The real filter is about 54 KB.
+**No footnotes** — For `.docx` the citation style is not carried in the file: the filter writes the style preference only for ODT output. Pick the style on Word's Zotero tab instead, and choose a note-based one (Chicago note-bibliography, GB/T 7714, and so on) if you want footnotes rather than in-text citations.
 
 **Citations stay as `[@citekey]`** — The key was not resolved. Pandocx surfaces the filter's own diagnostics as a notice; the full output is in the developer console under `[pandocx] filter output`.
 
 **Export fails and the notice is truncated** — The notice shows the first 800 characters. The full Pandoc stderr is in the developer console (`Ctrl`/`Cmd` + `Shift` + `I`).
 
-**Images are missing** — Pandoc runs with the note's folder as its working directory, and `--resource-path` is set to that folder plus the vault root. Images outside both need an explicit `--resource-path` entry in the extra arguments.
+**Images and wikilinks come out as literal text** — Pandoc does not understand Obsidian's `[[…]]` syntax. An image written as `![[picture.png]]` is dropped and the brackets appear as text; standard Markdown images (`![](picture.png)`) embed correctly whether the path is relative to the note, relative to the vault root, or absolute. The simplest fix is Settings → Files and links → turn off **Use [[Wikilinks]]**, which makes Obsidian write Markdown links from then on. Existing notes need converting, or a filter of your own chained through the extra arguments.
 
-**Wikilinks and `![[embeds]]` come out as literal text** — Pandoc does not understand Obsidian-specific syntax. Convert those links before exporting, or chain a filter of your own through the extra arguments.
+**`Could not fetch resource …: replacing image with description`** — The file genuinely is not there. Pandoc warns and carries on, so the export still succeeds, just without that image.
 
 **Existing files are overwritten** — Pandoc overwrites a same-named `.docx` without prompting.
 
