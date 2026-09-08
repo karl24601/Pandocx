@@ -38,12 +38,39 @@ const DEFAULT_SETTINGS = {
 // styles.css，不会下载 zotero.lua。所以过滤器源码内嵌在这里：插件启动时
 // 若目标文件不存在就写出来。已存在则绝不覆盖，避免冲掉用户自己的过滤器。
 //
-// 内容是 Better BibTeX 的 zotero-live-citations 过滤器，MIT 许可，
-// 作者 Emiliano Heyns。上游地址：
-//   https://retorque.re/zotero-better-bibtex/exporting/pandoc/
+// 以 base64 存储而非模板字面量：过滤器里含有反引号，base64 能保证逐字节
+// 还原。更新方法见 tools/embed-filter.js，不要手改下面那段。
 //
-// 以 base64 存储而非模板字面量：过滤器里含有反引号，base64 能保证
-// 逐字节还原。更新方法见 tools/embed-filter.js，不要手改下面这段。
+// 下面这段 base64 是 Better BibTeX 的 zotero-live-citations 过滤器，原样
+// 转载。MIT 要求版权与许可声明随「所有副本或实质性部分」分发，而通过 BRAT
+// 安装时用户只会拿到 main.js，因此声明必须留在本文件内 —— 请勿删除。
+//
+// ---------------------------------------------------------------------------
+// zotero-live-citations (revision 199d652), from Better BibTeX for Zotero
+// https://retorque.re/zotero-better-bibtex/exporting/pandoc/
+//
+// MIT License
+//
+// Copyright (c) 2016 Emiliano Heyns
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// ---------------------------------------------------------------------------
 
 /* @generated-filter-start */
 const FILTER_REVISION = '199d652';
