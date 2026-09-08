@@ -107,42 +107,6 @@ To build one:
 
 This pairs well with Zotero: refreshed citations are formatted with Word's `Footnote Text` style, so setting that style in the template makes footnotes come out right without further intervention.
 
-### Numbered figures and cross-references
-
-Optional, and only worth setting up if your figures need to be numbered and referred to by number. It requires [`pandoc-fignos`](https://github.com/tomduck/pandoc-fignos), a separate Python program that must be on `PATH`.
-
-Add to **Extra arguments**:
-
-```
--s --filter pandoc-fignos
-```
-
-Give each figure an identifier, and reference it with `{@fig:id}`:
-
-```markdown
-![Characteristics of big data](images/bigdata.png){#fig:bigdata}
-
-As shown in {@fig:bigdata}, ...
-```
-
-`pandoc-fignos` numbers the figures in order and turns each reference into a link to the corresponding caption.
-
-By default the caption reads `Figure 1` and the reference renders as `fig. 1`. Both labels are configurable through the note's front matter, which is how you get a Chinese document to say 图 instead:
-
-```yaml
----
-fignos-cleveref: true
-fignos-plus-name: 图
-fignos-caption-name: 图
----
-```
-
-- `fignos-caption-name` — the word used in captions (`图 1`)
-- `fignos-plus-name` — the word used in references, so `{@fig:bigdata}` renders as `图 1` rather than a bare `1`
-- `fignos-cleveref` — makes references include that name at all; without it you get only the number
-
-Two caveats. The cross-references come out as hyperlinks, not Word `REF` fields, so they will not renumber if you reorder figures in Word afterwards — for a document that will be revised in Word, inserting captions and cross-references there is often the better choice. And on macOS and Linux, a GUI-launched Obsidian may not find `pandoc-fignos` if it lives in a conda or virtualenv environment; the symptom is `Error running filter pandoc-fignos`.
-
 ### Other arguments worth knowing
 
 | Argument                                                | Effect                                                       |
