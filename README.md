@@ -81,7 +81,7 @@ The name you type is the **output** name only — the input is always the note y
 
 Arguments are passed to Pandoc as an argument array rather than through a shell, so spaces, quotes and non-ASCII characters in file names are handled correctly.
 
-### Matching your institution's formatting
+## Matching your institution's formatting
 
 Pandoc's default `.docx` output uses generic styling. To make every export come out in your department's required format — typeface, line spacing, heading levels, footnote size, margins — point Pandoc at a reference document:
 
@@ -112,10 +112,7 @@ This pairs well with Zotero: refreshed citations are formatted with Word's `Foot
 | Argument                                                | Effect                                                       |
 | ------------------------------------------------------- | ------------------------------------------------------------ |
 | `--toc --toc-depth=3`                                   | Inserts a table of contents field. You may need to press F9 in Word to populate it |
-| `--metadata=zotero_csl-style:chicago-note-bibliography` | Sets the citation style for every export, so individual notes don't each need `zotero:` front matter |
-| `-t docx+native_numbering` | Numbers figure and table captions (`Figure 1: …`) as real Word `SEQ` fields. The label comes from Pandoc's translation data and there is no Chinese one, so under `-M lang=zh` it vanishes rather than becoming 图 unless you supply your own `translations/zh.yaml` via `--data-dir`. Note that `pandoc-fignos`, which older guides recommend for this, aborts on Pandoc 3.x |
-
-Note that a `zotero_`-prefixed argument **overrides** the note's own front matter rather than acting as a default for it. Set the style this way and every export uses it, including notes that specify something else. If you switch styles per document, leave it out and keep the setting in each note instead.
+| `-t docx+native_numbering` | Numbers figure and table captions (`Figure 1: …`) as real Word `SEQ` fields. The label comes from Pandoc's translation data and there is no Chinese one, so under `-M lang=zh` it vanishes rather than becoming 图 unless you supply your own `translations/zh.yaml` via `--data-dir`. Note that `pandoc-fignos`, which older guides recommend for this, [does not work on Pandoc 3.x](https://github.com/tomduck/pandoc-fignos/issues/107) — it was last tested against Pandoc 2.11 and aborts before producing a file |
 
 Markdown footnotes (`[^1]`) already become real Word footnotes without any extra arguments — useful for explanatory notes that are not citations.
 
