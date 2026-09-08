@@ -35,16 +35,17 @@ Not yet in the community plugin browser.
 3. Enter `karl24601/Pandocx` and confirm.
 4. Enable **Pandocx** under Settings → Community plugins.
 
-BRAT only fetches `main.js`, `manifest.json` and `styles.css`, so `zotero.lua` is not downloaded. Pandocx handles this: it writes a placeholder `zotero.lua` into its own plugin folder on first launch. **Replace that file with your own filter** — the path is `<vault>/.obsidian/plugins/pandocx/zotero.lua`.
+BRAT only fetches `main.js`, `manifest.json` and `styles.css`, so `zotero.lua` is never downloaded. Pandocx handles this: the filter is embedded in `main.js` and written to `<vault>/.obsidian/plugins/pandocx/zotero.lua` on first launch. Nothing to configure — citations work out of the box.
 
-The placeholder is only ever created when the file is missing, so your own filter is never overwritten, including on updates.
+If you want a modified filter, overwrite that file. Pandocx only writes it when it is missing, so your version survives updates.
 
 ### Manual
 
 1. Download `main.js`, `manifest.json` and `zotero.lua` from the [latest release](../../releases/latest).
 2. Put them in `<vault>/.obsidian/plugins/pandocx/`.
-3. **Replace `zotero.lua` with your own filter.** The shipped file is a no-op placeholder. Keep the file name unchanged.
-4. Restart or reload Obsidian, then enable **Pandocx** under Settings → Community plugins.
+3. Restart or reload Obsidian, then enable **Pandocx** under Settings → Community plugins.
+
+`zotero.lua` is the working Better BibTeX filter, not a stub — no substitution needed. To use a modified filter, overwrite that file and keep the name unchanged.
 
 ## Usage
 
@@ -70,6 +71,44 @@ The name you type is the **output** name only — the input is always the note y
 
 Arguments are passed to Pandoc as an argument array rather than through a shell, so spaces, quotes and non-ASCII characters in file names are handled correctly.
 
+## Matching your institution's formatting
+
+Pandoc's default `.docx` output uses generic styling. To make every export come out in your department's required format — typeface, line spacing, heading levels, footnote size, margins — point Pandoc at a reference document:
+
+```
+-s --reference-doc="/path/to/thesis-template.docx"
+```
+
+Pandoc reads **style definitions and page setup** from that file and ignores its text, so you configure the format once and every export inherits it.
+
+To build one:
+
+1. Generate Pandoc's default template — you only ever do this once:
+
+   ```bash
+   pandoc -o thesis-template.docx --print-default-data-file reference.docx
+   ```
+
+2. Open it in Word and edit the **style definitions** themselves (Styles pane → right-click a style → Modify). Selecting text and changing its font does not work: Pandoc reads the styles, not the formatting of individual runs.
+
+   The ones that usually matter: `Normal` for body text, `Heading 1`–`Heading 3`, `Footnote Text`, `Title`, `Author`, and `Block Text` for block quotations. Margins, paper size and headers/footers carry over from this file too.
+
+3. Save it outside your vault — a synced folder invites conflicts — and put the path in **Extra arguments**. Quote it if it contains spaces.
+
+This pairs well with Zotero: refreshed citations are formatted with Word's `Footnote Text` style, so setting that style in the template makes footnotes come out right without further intervention.
+
+### Other arguments worth knowing
+
+| Argument | Effect |
+| --- | --- |
+| `--toc --toc-depth=3` | Inserts a table of contents field. You may need to press F9 in Word to populate it |
+| `--metadata=zotero_csl-style:chicago-note-bibliography` | Sets the citation style globally, so individual notes don't each need `zotero:` front matter |
+| `--filter pandoc-fignos` | Numbered figure cross-references. Note that these become hyperlinks rather than Word REF fields, and `pandoc-fignos` is a separate Python program that has to be on `PATH` |
+
+Markdown footnotes (`[^1]`) already become real Word footnotes without any extra arguments — useful for explanatory notes that are not citations.
+
+Do not combine `--citeproc`, `--bibliography` or `--csl` with the bundled filter. Those drive Pandoc's own static citation processing, which conflicts with the live Zotero fields.
+
 ## Troubleshooting
 
 **"Pandoc not found"** — On macOS and Linux, a GUI-launched Obsidian does not inherit your login shell's `PATH`. Pandocx already appends the usual locations (`/opt/homebrew/bin`, `/usr/local/bin`, `~/.local/bin`, …). If it still fails, run `which pandoc` in a terminal and paste the full path into the settings.
@@ -89,7 +128,7 @@ zotero:
 ---
 ```
 
-**Upgraded from 1.0.0 and citations are untouched** — 1.0.0 shipped a no-op placeholder `zotero.lua`, and updates never overwrite an existing filter, so the placeholder survived. Pandocx detects and replaces it automatically. To fix it by hand, delete `zotero.lua` from the plugin folder and reload Obsidian.
+**Citations are untouched and `zotero.lua` is only ~700 bytes** — An early build shipped a do-nothing placeholder, and Pandocx never overwrites an existing filter, so it can survive an update. Pandocx now detects and replaces it on load; to fix it by hand, delete `zotero.lua` from the plugin folder and reload Obsidian. The real filter is about 54 KB.
 
 **Citations stay as `[@citekey]`** — The key was not resolved. Pandocx surfaces the filter's own diagnostics as a notice; the full output is in the developer console under `[pandocx] filter output`.
 
@@ -101,7 +140,7 @@ zotero:
 
 **Existing files are overwritten** — Pandoc overwrites a same-named `.docx` without prompting.
 
-**The filter reverts to the placeholder** — Pandocx only writes `zotero.lua` when the file is absent, so this means the file went missing rather than being replaced. Reinstalling the plugin folder from scratch will do it. Keep a copy of your filter outside the plugin folder.
+**A modified filter reverted to the bundled one** — Pandocx rewrites `zotero.lua` only when the file is absent, so this means it went missing rather than being replaced; wiping and reinstalling the plugin folder will do it. If you maintain your own edits, keep a copy outside the plugin folder.
 
 ## Development
 
