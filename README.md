@@ -81,7 +81,7 @@ The name you type is the **output** name only — the input is always the note y
 
 Arguments are passed to Pandoc as an argument array rather than through a shell, so spaces, quotes and non-ASCII characters in file names are handled correctly.
 
-## Matching your institution's formatting
+### Matching your institution's formatting
 
 Pandoc's default `.docx` output uses generic styling. To make every export come out in your department's required format — typeface, line spacing, heading levels, footnote size, margins — point Pandoc at a reference document:
 
